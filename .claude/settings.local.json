@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(curl -s http://localhost:3000/api/movies)",
+      "Bash(python -m json.tool)",
+      "Bash(curl -s http://localhost:3000/api/movies/187629d9-8e24-4ec6-9c8f-364aeacf3c33/screenings)",
+      "Bash(curl -s http://localhost:3000/api/screenings/a0257e11-318f-41da-9054-5520f09cdaf9/seats)",
+      "Bash(curl -s -X POST http://localhost:3000/api/reservations -H 'Content-Type: application/json' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MmZiNzlkYy02MGY1LTQzMmUtYWJhYi0yMzRiNDU4NTgyM2EiLCJlbWFpbCI6Indsd2x3bEBuYXZlci5jb20iLCJpYXQiOjE3NzYyMDU3NzQsImV4cCI6MTc3NjI5MjE3NH0.fvwlwPUCgiAgg3v7VEQXoc-1fKuiMhVIKv_ny-iKpws' -d '{\"screeningId\":\"a0257e11-318f-41da-9054-5520f09cdaf9\",\"seatId\":\"433ddd8d-23fd-496c-a052-2ec9fa65d807\"}')"
+    ]
+  }
+}

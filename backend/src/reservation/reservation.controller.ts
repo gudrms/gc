@@ -13,8 +13,13 @@ export class ReservationController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: '좌석 예매' })
+  @ApiOperation({
+    summary: '좌석 예매',
+    description:
+      '예매 순서: ①GET /api/movies → ②GET /api/movies/{id}/screenings 에서 screeningId 획득 → ③GET /api/screenings/{id}/seats 에서 seatId 획득 → ④본 API 호출',
+  })
   @ApiResponse({ status: 201, description: '예매 성공' })
+  @ApiResponse({ status: 400, description: '이미 시작된 상영 or 잘못된 좌석' })
   @ApiResponse({ status: 409, description: '이미 예매된 좌석' })
   create(
     @CurrentUser() user: { id: string },
