@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: movie-booking-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: movie_booking
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: movie-booking-api
+    # 프로덕션 환경에서는 .env 파일 또는 시크릿 매니저를 통해 환경변수를 주입하세요.
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/movie_booking?schema=public
+      JWT_SECRET: ${JWT_SECRET:-movie-booking-jwt-secret-dev-only}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
+      PORT: 3000
+    ports:
+      - '3000:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: movie-booking-web
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3000/api
+    ports:
+      - '3001:3001'
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

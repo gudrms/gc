@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  password     String
+  name         String
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  reservations Reservation[]
+
+  @@map("users")
+}
+
+model Movie {
+  id              String      @id @default(uuid())
+  title           String
+  description     String?
+  genre           String
+  durationMinutes Int         @map("duration_minutes")
+  rating          String      // 전체, 12세, 15세, 청불
+  createdAt       DateTime    @default(now()) @map("created_at")
+  screenings      Screening[]
+
+  @@map("movies")
+}
+
+model Screen {
+  id         String      @id @default(uuid())
+  name       String      // 1관, 2관, 3관
+  totalSeats Int         @map("total_seats")
+  seats      Seat[]
+  screenings Screening[]
+
+  @@map("screens")
+}
+
+model Seat {
+  id           String        @id @default(uuid())
+  screenId     String        @map("screen_id")
+  row          String        // A, B, C, ...
+  number       Int           // 1, 2, 3, ...
+  screen       Screen        @relation(fields: [screenId], references: [id])
+  reservations Reservation[]
+
+  @@unique([screenId, row, number])
+  @@map("seats")
+}
+
+model Screening {
+  id           String        @id @default(uuid())
+  movieId      String        @map("movie_id")
+  screenId     String        @map("screen_id")
+  startTime    DateTime      @map("start_time")
+  endTime      DateTime      @map("end_time")
+  price        Decimal       @db.Decimal(10, 2)
+  movie        Movie         @relation(fields: [movieId], references: [id])
+  screen       Screen        @relation(fields: [screenId], references: [id])
+  reservations Reservation[]
+
+  @@index([movieId])
+  @@index([screenId])
+  @@map("screenings")
+}
+
+enum ReservationStatus {
+  CONFIRMED
+  CANCELLED
+}
+
+model Reservation {
+  id          String            @id @default(uuid())
+  userId      String            @map("user_id")
+  screeningId String            @map("screening_id")
+  seatId      String            @map("seat_id")
+  status      ReservationStatus @default(CONFIRMED)
+  createdAt   DateTime          @default(now()) @map("created_at")
+  cancelledAt DateTime?         @map("cancelled_at")
+  user        User              @relation(fields: [userId], references: [id])
+  screening   Screening         @relation(fields: [screeningId], references: [id])
+  seat        Seat              @relation(fields: [seatId], references: [id])
+
+  @@index([userId])
+  @@index([screeningId])
+  @@index([screeningId, seatId])
+  @@map("reservations")
+}
