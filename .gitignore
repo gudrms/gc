@@ -95,5 +95,4 @@ generated/prisma/
 .claude/
 AGENTS.md
 CLAUDE.md
-docs/.bkit-memory.json
-docs/.pdca-status.json
+docs/
