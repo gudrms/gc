@@ -88,3 +88,12 @@ generated/prisma/
 .cache
 .parcel-cache
 *.tgz
+
+# ========================
+# AI Tool files
+# ========================
+.claude/
+AGENTS.md
+CLAUDE.md
+docs/.bkit-memory.json
+docs/.pdca-status.json
