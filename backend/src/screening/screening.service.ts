@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { ReservationStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -39,7 +40,7 @@ export class ScreeningService {
     const reservedSeatIds = await this.prisma.reservation.findMany({
       where: {
         screeningId,
-        status: 'CONFIRMED',
+        status: ReservationStatus.CONFIRMED,
       },
       select: { seatId: true },
     });

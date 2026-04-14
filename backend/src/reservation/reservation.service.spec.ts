@@ -16,7 +16,9 @@ describe('ReservationService', () => {
     seat: { findUnique: jest.fn() },
     reservation: {
       findFirst: jest.fn(),
+      findUnique: jest.fn(),
       create: jest.fn(),
+      update: jest.fn(),
     },
   };
 
@@ -24,8 +26,6 @@ describe('ReservationService', () => {
     $transaction: jest.fn((cb) => cb(mockTx)),
     reservation: {
       findMany: jest.fn(),
-      findUnique: jest.fn(),
-      update: jest.fn(),
     },
   };
 
@@ -137,12 +137,12 @@ describe('ReservationService', () => {
 
   describe('cancel', () => {
     it('본인 예매 취소 성공', async () => {
-      mockPrisma.reservation.findUnique.mockResolvedValue({
+      mockTx.reservation.findUnique.mockResolvedValue({
         id: 'res-1',
         userId: 'user-1',
         status: 'CONFIRMED',
       });
-      mockPrisma.reservation.update.mockResolvedValue({
+      mockTx.reservation.update.mockResolvedValue({
         id: 'res-1',
         status: 'CANCELLED',
       });
@@ -153,7 +153,7 @@ describe('ReservationService', () => {
     });
 
     it('타인의 예매 취소 시 ForbiddenException', async () => {
-      mockPrisma.reservation.findUnique.mockResolvedValue({
+      mockTx.reservation.findUnique.mockResolvedValue({
         id: 'res-1',
         userId: 'other-user',
         status: 'CONFIRMED',
@@ -165,7 +165,7 @@ describe('ReservationService', () => {
     });
 
     it('이미 취소된 예매는 BadRequestException', async () => {
-      mockPrisma.reservation.findUnique.mockResolvedValue({
+      mockTx.reservation.findUnique.mockResolvedValue({
         id: 'res-1',
         userId: 'user-1',
         status: 'CANCELLED',

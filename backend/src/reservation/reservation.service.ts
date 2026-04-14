@@ -5,7 +5,7 @@ import {
   BadRequestException,
   ForbiddenException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, ReservationStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 
@@ -43,7 +43,7 @@ export class ReservationService {
           where: {
             screeningId: dto.screeningId,
             seatId: dto.seatId,
-            status: 'CONFIRMED',
+            status: ReservationStatus.CONFIRMED,
           },
         });
         if (existingReservation) {
@@ -88,30 +88,32 @@ export class ReservationService {
   }
 
   async cancel(userId: string, reservationId: string) {
-    const reservation = await this.prisma.reservation.findUnique({
-      where: { id: reservationId },
-    });
+    return this.prisma.$transaction(async (tx) => {
+      const reservation = await tx.reservation.findUnique({
+        where: { id: reservationId },
+      });
 
-    if (!reservation) {
-      throw new NotFoundException('예매를 찾을 수 없습니다.');
-    }
-    if (reservation.userId !== userId) {
-      throw new ForbiddenException('본인의 예매만 취소할 수 있습니다.');
-    }
-    if (reservation.status === 'CANCELLED') {
-      throw new BadRequestException('이미 취소된 예매입니다.');
-    }
+      if (!reservation) {
+        throw new NotFoundException('예매를 찾을 수 없습니다.');
+      }
+      if (reservation.userId !== userId) {
+        throw new ForbiddenException('본인의 예매만 취소할 수 있습니다.');
+      }
+      if (reservation.status === ReservationStatus.CANCELLED) {
+        throw new BadRequestException('이미 취소된 예매입니다.');
+      }
 
-    return this.prisma.reservation.update({
-      where: { id: reservationId },
-      data: {
-        status: 'CANCELLED',
-        cancelledAt: new Date(),
-      },
-      include: {
-        screening: { include: { movie: true, screen: true } },
-        seat: true,
-      },
+      return tx.reservation.update({
+        where: { id: reservationId },
+        data: {
+          status: ReservationStatus.CANCELLED,
+          cancelledAt: new Date(),
+        },
+        include: {
+          screening: { include: { movie: true, screen: true } },
+          seat: true,
+        },
+      });
     });
   }
 }

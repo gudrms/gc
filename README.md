@@ -53,10 +53,22 @@ npm run dev
 
 ### 테스트
 
+**Docker 사용 시 (권장 — 별도 설치 불필요)**
+
 ```bash
+docker exec movie-booking-api npm run test        # 유닛 테스트 (20개)
+docker exec movie-booking-api npm run test:e2e    # E2E 테스트 (17개)
+```
+
+**로컬 실행 시 (postgres 컨테이너 필요)**
+
+```bash
+docker-compose up -d postgres   # DB만 먼저 실행
+
 cd backend
+npm install
 npm run test        # 유닛 테스트 (20개)
-npm run test:e2e    # E2E 테스트 (16개)
+npm run test:e2e    # E2E 테스트 (17개)
 ```
 
 ## 프로젝트 구조
