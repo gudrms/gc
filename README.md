@@ -13,7 +13,7 @@
 | API Docs | Swagger |
 | Frontend | Next.js (App Router), Tailwind CSS |
 | Infra | Docker, docker-compose |
-| Test | Jest (유닛 20개 + E2E 16개) |
+| Test | Jest (유닛 20개 + E2E 17개) |
 
 ## 실행 방법
 
